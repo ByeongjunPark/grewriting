@@ -47,7 +47,12 @@ export default function Dashboard() {
     const storedHistory = localStorage.getItem("gre_awa_history");
     if (storedHistory) {
       try {
-        setHistory(JSON.parse(storedHistory));
+        const parsed = JSON.parse(storedHistory);
+        // Filter out the old mock history items (hist-1, hist-2)
+        const filtered = parsed.filter((item: any) => item.id !== "hist-1" && item.id !== "hist-2");
+        setHistory(filtered);
+        // Update localStorage to commit the cleanup
+        localStorage.setItem("gre_awa_history", JSON.stringify(filtered));
       } catch (e) {
         setHistory([]);
       }
