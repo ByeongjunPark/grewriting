@@ -83,7 +83,7 @@ export default function Dashboard() {
             </div>
             <div>
               <span className="font-extrabold text-xl text-slate-900 tracking-tight">GRE AWA Coach</span>
-              <span className="ml-2 text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-650 rounded-full border border-indigo-100">Solar-Pro</span>
+              <span className="ml-2 text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">Solar-Pro</span>
             </div>
           </div>
           <nav className="hidden sm:flex items-center space-x-8 text-sm font-semibold text-slate-500">
@@ -110,7 +110,7 @@ export default function Dashboard() {
             <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight sm:text-5xl">
               GRE Analytical Writing Masterclass
             </h1>
-            <p className="text-slate-555 text-base sm:text-lg leading-relaxed max-w-3xl font-medium">
+            <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-3xl font-medium">
               GRE 라이팅의 유일한 과제인 **&quot;Analyze an Issue&quot;**를 위한 초보자 맞춤형 에세이 코치입니다. 
               단계별 지도를 통해 처음 접하는 사람도 논리적인 글을 완성하고, **Solar AI**를 통한 정밀 평가를 받아보세요.
             </p>
@@ -141,7 +141,7 @@ export default function Dashboard() {
                 <h3 className="text-xl font-bold font-serif text-slate-850 leading-relaxed">
                   &ldquo;{selectedTopic.prompt}&rdquo;
                 </h3>
-                <div className="p-4 bg-slate-50 rounded-xl text-sm text-slate-650 border-l-4 border-slate-400 leading-relaxed font-medium">
+                <div className="p-4 bg-slate-50 rounded-xl text-sm text-slate-600 border-l-4 border-slate-400 leading-relaxed font-medium">
                   <span className="font-bold block text-slate-850 mb-1">Task Directions (지시 사항):</span>
                   {selectedTopic.instruction}
                 </div>
@@ -237,7 +237,7 @@ export default function Dashboard() {
               </div>
               <button 
                 onClick={() => startPractice("step-by-step")}
-                className="bg-indigo-650 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg flex items-center space-x-2 transition duration-200"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg flex items-center space-x-2 transition duration-200 cursor-pointer"
               >
                 <span>연습 시작</span>
                 <ArrowRight className="h-4 w-4" />
@@ -259,7 +259,7 @@ export default function Dashboard() {
                   실전 모의고사 모드
                   <span className="block text-sm font-semibold text-slate-400 mt-1">Realistic Mock Exam</span>
                 </h2>
-                <p className="text-slate-555 text-sm leading-relaxed font-medium">
+                <p className="text-slate-650 text-sm leading-relaxed font-medium">
                   실제 GRE 시험장 소프트웨어와 동질의 긴장감을 재현합니다. 화면 일시정지가 불가능한 **30분 타이머**가 작동하며, 편집 도구나 장식 없는 순수 텍스트 편집기 안에서 시간 조절 및 타자 입력 연습을 훈련합니다.
                 </p>
               </div>
@@ -272,7 +272,7 @@ export default function Dashboard() {
               </div>
               <button 
                 onClick={() => startPractice("mock-test")}
-                className="bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg flex items-center space-x-2 transition duration-200"
+                className="bg-indigo-900 hover:bg-indigo-950 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg flex items-center space-x-2 transition duration-200 cursor-pointer"
               >
                 <span>모의고사 시작</span>
                 <ArrowRight className="h-4 w-4" />
