@@ -14,8 +14,7 @@ import {
   BookOpen,
   Info,
   Lightbulb,
-  Compass,
-  Bookmark
+  Compass
 } from "lucide-react";
 import { greTopics, GRETopic } from "../../data/gre-topics";
 
@@ -44,11 +43,8 @@ export default function StepByStepTraining() {
   // Step 3: Drafting essay
   const [essay, setEssay] = useState<string>("");
   
-  // Shared sidebar coach tab: "coach" | "background"
-  const [coachTab, setCoachTab] = useState<"coach" | "background">("coach");
-  
-  // Step 3: Tab state for left panel ("outline" | "coach" | "background")
-  const [leftTab, setLeftTab] = useState<"outline" | "coach" | "background">("outline");
+  // Step 3: Tab state for left panel ("outline" | "coach")
+  const [leftTab, setLeftTab] = useState<"outline" | "coach">("outline");
   
   // Step 4: Submission checks
   const [checklist, setChecklist] = useState({
@@ -126,8 +122,8 @@ export default function StepByStepTraining() {
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    const secs = seconds % 65; // Wait, actually standard seconds % 60
+    return `${mins.toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
   };
 
   const handleSubmit = async () => {
@@ -232,67 +228,6 @@ export default function StepByStepTraining() {
     }
   };
 
-  // Helper component to render the Agree/Disagree Background knowledge
-  const renderBackgroundStudy = () => {
-    return (
-      <div className="space-y-6 text-left">
-        {/* Agree Points */}
-        <div>
-          <span className="inline-flex items-center px-2.5 py-0.5 bg-green-50 text-green-700 rounded border border-green-150 text-[10px] font-black uppercase mb-3">
-            Agree Stance (찬성 측 논증 및 미국사례)
-          </span>
-          <div className="space-y-3">
-            {topic.agreePoints?.map((pt, idx) => (
-              <div key={idx} className="bg-slate-50 border border-slate-200/60 rounded-xl p-3.5 space-y-2.5 text-xs font-medium">
-                <p className="text-slate-850 leading-relaxed font-bold">
-                  • {pt.argumentKo}
-                </p>
-                <p className="font-mono text-slate-500 italic text-[10px] leading-relaxed border-t border-slate-200/60 pt-2">
-                  {pt.argumentEn}
-                </p>
-                
-                <div className="mt-2.5 bg-white border border-slate-100 rounded-lg p-2.5 space-y-1.5">
-                  <span className="text-[10px] font-bold text-indigo-600 block">🇺🇸 US Background Example (미국 배경지식 사례)</span>
-                  <p className="text-slate-650 leading-relaxed font-sans">{pt.exampleKo}</p>
-                  <p className="font-mono text-slate-400 italic text-[10px] leading-relaxed border-t border-slate-100 pt-1.5">
-                    {pt.exampleEn}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Disagree Points */}
-        <div className="border-t border-slate-200 pt-5">
-          <span className="inline-flex items-center px-2.5 py-0.5 bg-red-50 text-red-700 rounded border border-red-150 text-[10px] font-black uppercase mb-3">
-            Disagree Stance (반대 측 논증 및 미국사례)
-          </span>
-          <div className="space-y-3">
-            {topic.disagreePoints?.map((pt, idx) => (
-              <div key={idx} className="bg-slate-50 border border-slate-200/60 rounded-xl p-3.5 space-y-2.5 text-xs font-medium">
-                <p className="text-slate-850 leading-relaxed font-bold">
-                  • {pt.argumentKo}
-                </p>
-                <p className="font-mono text-slate-500 italic text-[10px] leading-relaxed border-t border-slate-200/60 pt-2">
-                  {pt.argumentEn}
-                </p>
-                
-                <div className="mt-2.5 bg-white border border-slate-100 rounded-lg p-2.5 space-y-1.5">
-                  <span className="text-[10px] font-bold text-red-500 block">🇺🇸 US Background Example (미국 배경지식 사례)</span>
-                  <p className="text-slate-650 leading-relaxed font-sans">{pt.exampleKo}</p>
-                  <p className="font-mono text-slate-400 italic text-[10px] leading-relaxed border-t border-slate-100 pt-1.5">
-                    {pt.exampleEn}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-slate-50 text-slate-800">
       {/* Header with Nav */}
@@ -310,7 +245,7 @@ export default function StepByStepTraining() {
             <span>대시보드로 나가기</span>
           </button>
           
-          <div className="flex items-center space-x-4 animate-fade-in">
+          <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100 rounded-xl text-slate-700 text-sm font-bold">
               <Clock className="h-4.5 w-4.5 text-slate-500" />
               <span className={timeLeft < 60 ? "text-red-500 font-black animate-pulse" : ""}>
@@ -413,7 +348,7 @@ export default function StepByStepTraining() {
                   </span>
                   <h2 className="text-2xl font-black text-slate-900 tracking-tight">Q. 출제 주제 분석하기</h2>
                   <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                    아래 출제된 주제의 지시문을 꼼꼼히 읽어보세요. 특히 <span className="prompt-highlight font-semibold">구체적인 지시사항</span>이 무엇을 요구하는지 확인한 뒤, 이 질문의 핵심 갈등/쟁점이 무엇인지 한국어로 가볍게 써 봅니다. 우측의 배경지식 공부방 탭을 활성화하면 미국사 예시를 바로 공부할 수 있습니다.
+                    아래 출제된 주제의 지시문을 꼼꼼히 읽어보세요. 특히 <span className="prompt-highlight font-semibold">구체적인 지시사항</span>이 무엇을 요구하는지 확인한 뒤, 이 질문의 핵심 갈등/쟁점이 무엇인지 한국어로 가볍게 써 봅니다. (배경지식은 대시보드 공부방에서 먼저 학습하고 올 수 있습니다)
                   </p>
                 </div>
 
@@ -476,46 +411,26 @@ export default function StepByStepTraining() {
               </div>
             </div>
 
-            {/* Beginner Coach Tabbed Panel (Right 1/3) */}
-            <div className="lg:col-span-1 bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden shadow-sm h-[600px]">
-              <div className="flex bg-slate-50 border-b border-slate-200 select-none">
-                <button
-                  onClick={() => setCoachTab("coach")}
-                  className={`flex-1 py-3.5 text-xs font-bold text-center border-b-2 transition cursor-pointer ${
-                    coachTab === "coach" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-slate-500 hover:text-slate-900"
-                  }`}
-                >
-                  에세이 코치 (AWA 101)
-                </button>
-                <button
-                  onClick={() => setCoachTab("background")}
-                  className={`flex-1 py-3.5 text-xs font-bold text-center border-b-2 transition cursor-pointer ${
-                    coachTab === "background" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-slate-500 hover:text-slate-900"
-                  }`}
-                >
-                  배경지식 공부방 (🇺🇸)
-                </button>
-              </div>
-
-              <div className="flex-1 p-5 overflow-y-auto space-y-4">
-                {coachTab === "coach" ? (
-                  <div className="space-y-4 text-xs leading-relaxed text-slate-655 font-medium">
-                    <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-slate-700">
-                      <span className="font-bold text-indigo-700 block mb-1">💡 GRE Analytical Writing 기초</span>
-                      이 시험은 단순히 영어를 기교 있게 쓰는지를 넘어, **&quot;주어진 주제에 대한 설득력 있는 논리 분석을 전개할 수 있는가&quot;**를 평가합니다.
-                    </div>
-                    <div className="space-y-2">
-                      <span className="font-bold text-slate-800 block">✔ 핵심 쟁점(Central Tension)이란?</span>
-                      GRE 모든 주제는 무조건 찬성하거나 반대할 수 없는 **대립 가치**를 내포합니다. 그 양극단의 가치가 무엇인지 파악하는 것이 논리적인 에세이 작성의 첫 단추입니다.
-                    </div>
-                    <div className="space-y-2">
-                      <span className="font-bold text-slate-800 block">✔ 지시사항(Specific Directions)에 집중하세요</span>
-                      지시사항이 요구하는 행동(예: 반대 입장 비판, 구체적 예외 설명 등)을 본문 문단에 반드시 명시해야 감점을 피할 수 있습니다.
-                    </div>
-                  </div>
-                ) : (
-                  renderBackgroundStudy()
-                )}
+            {/* Beginner Coach Panel (Right 1/3) */}
+            <div className="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 h-[550px] overflow-y-auto">
+              <h3 className="font-extrabold text-slate-900 text-sm flex items-center space-x-2 border-b border-slate-100 pb-2">
+                <Compass className="h-4.5 w-4.5 text-indigo-600" />
+                <span>에세이 코치 (AWA 101)</span>
+              </h3>
+              
+              <div className="space-y-4 text-xs leading-relaxed text-slate-600 font-medium">
+                <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-slate-700">
+                  <span className="font-bold text-indigo-700 block mb-1">💡 GRE Analytical Writing 기초</span>
+                  이 시험은 단순히 영어를 기교 있게 쓰는지를 넘어, **&quot;주어진 주제에 대한 설득력 있는 논리 분석을 전개할 수 있는가&quot;**를 평가합니다.
+                </div>
+                <div className="space-y-2">
+                  <span className="font-bold text-slate-800 block">✔ 핵심 쟁점(Central Tension)이란?</span>
+                  GRE 모든 주제는 무조건 찬성하거나 반대할 수 없는 **대립 가치**를 내포합니다. 그 양극단의 가치가 무엇인지 파악하는 것이 논리적인 에세이 작성의 첫 단추입니다.
+                </div>
+                <div className="space-y-2">
+                  <span className="font-bold text-slate-800 block">✔ 지시사항(Specific Directions)에 집중하세요</span>
+                  지시사항이 요구하는 행동(예: 반대 입장 비판, 구체적 예외 설명 등)을 본문 문단에 반드시 명시해야 감점을 피할 수 있습니다.
+                </div>
               </div>
             </div>
           </div>
@@ -533,7 +448,7 @@ export default function StepByStepTraining() {
                   </span>
                   <h2 className="text-2xl font-black text-slate-900 tracking-tight">Q. 논리 뼈대 세우기</h2>
                   <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                    본문을 쓰기 전 개요를 잡습니다. 입장(Stance)을 선택한 후, 근거 2가지와 예상되는 반론에 대한 재반박을 영어 구절이나 한국어 키워드로 미리 메모해두세요. 우측 공부방 탭에서 미국사 사례를 그대로 활용할 수 있습니다.
+                    본문을 쓰기 전 개요를 잡습니다. 입장(Stance)을 선택한 후, 근거 2가지와 예상되는 반론에 대한 재반박을 영어 구절이나 한국어 키워드로 미리 메모해두세요.
                   </p>
                 </div>
 
@@ -571,7 +486,7 @@ export default function StepByStepTraining() {
                       rows={3}
                       className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white font-medium"
                       value={reason1}
-                      onChange={(e) => setReason1(e.target.value)}
+                      onChange={(e) => reason1 !== e.target.value && setReason1(e.target.value)}
                     />
                   </div>
 
@@ -584,7 +499,7 @@ export default function StepByStepTraining() {
                       rows={3}
                       className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white font-medium"
                       value={reason2}
-                      onChange={(e) => setReason2(e.target.value)}
+                      onChange={(e) => reason2 !== e.target.value && setReason2(e.target.value)}
                     />
                   </div>
 
@@ -597,7 +512,7 @@ export default function StepByStepTraining() {
                       rows={3}
                       className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white font-medium"
                       value={rebuttal}
-                      onChange={(e) => setRebuttal(e.target.value)}
+                      onChange={(e) => rebuttal !== e.target.value && setRebuttal(e.target.value)}
                     />
                   </div>
                 </div>
@@ -620,49 +535,29 @@ export default function StepByStepTraining() {
               </div>
             </div>
 
-            {/* Beginner Coach Tabbed Panel (Right 1/3) */}
-            <div className="lg:col-span-1 bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden shadow-sm h-[600px]">
-              <div className="flex bg-slate-50 border-b border-slate-200 select-none">
-                <button
-                  onClick={() => setCoachTab("coach")}
-                  className={`flex-1 py-3.5 text-xs font-bold text-center border-b-2 transition cursor-pointer ${
-                    coachTab === "coach" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-slate-500 hover:text-slate-900"
-                  }`}
-                >
-                  개요 작성 노하우
-                </button>
-                <button
-                  onClick={() => setCoachTab("background")}
-                  className={`flex-1 py-3.5 text-xs font-bold text-center border-b-2 transition cursor-pointer ${
-                    coachTab === "background" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-slate-500 hover:text-slate-900"
-                  }`}
-                >
-                  배경지식 공부방 (🇺🇸)
-                </button>
-              </div>
-
-              <div className="flex-1 p-5 overflow-y-auto space-y-4">
-                {coachTab === "coach" ? (
-                  <div className="space-y-4 text-xs leading-relaxed text-slate-655 font-medium">
-                    <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-slate-750">
-                      <span className="font-bold text-indigo-700 block mb-1">💡 설득력 있는 예시 선택법</span>
-                      **주의:** &quot;내 친구가 겪었던 일인데...&quot; 같은 사적인 에피소드는 감점 요인입니다. 역사적 사실, 저명한 사회 현상, 혹은 과학적 지식 등 누구나 아는 객관적 사례를 사용하세요.
-                    </div>
-                    <div className="space-y-2">
-                      <span className="font-bold text-slate-800 block">✔ PEEL 문단 구조화 기법</span>
-                      - **P (Point)**: 핵심 논리 주장 1줄 적기 (주제문)
-                      - **E (Explanation)**: 주장을 보충하는 부연 논증 설명
-                      - **E (Example)**: 객관적인 역사/사회적 사례 예시
-                      - **L (Link)**: 사례와 주장을 엮어 나의 입장 매핑
-                    </div>
-                    <div className="space-y-2">
-                      <span className="font-bold text-slate-800 block">✔ 반론 재반박(Concession)은 필수</span>
-                      글 전체의 객관성을 위해 반대 측의 주장도 그럴듯하다는 것을 수용한 뒤 재반박하는 것이 만점의 필수 조항입니다.
-                    </div>
-                  </div>
-                ) : (
-                  renderBackgroundStudy()
-                )}
+            {/* Beginner Coach Panel (Right 1/3) */}
+            <div className="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 h-[550px] overflow-y-auto">
+              <h3 className="font-extrabold text-slate-900 text-sm flex items-center space-x-2 border-b border-slate-100 pb-2">
+                <Lightbulb className="h-4.5 w-4.5 text-indigo-600" />
+                <span>개요 작성 노하우</span>
+              </h3>
+              
+              <div className="space-y-4 text-xs leading-relaxed text-slate-600 font-medium">
+                <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-slate-750">
+                  <span className="font-bold text-indigo-700 block mb-1">💡 설득력 있는 예시 선택법</span>
+                  **주의:** &quot;내 친구가 겪었던 일인데...&quot; 같은 사적인 에피소드는 감점 요인입니다. 역사적 사실, 저명한 사회 현상, 혹은 과학적 지식 등 누구나 아는 객관적 사례를 사용하세요.
+                </div>
+                <div className="space-y-2">
+                  <span className="font-bold text-slate-800 block">✔ PEEL 문단 구조화 기법</span>
+                  - **P (Point)**: 핵심 논리 주장 1줄 적기 (주제문)
+                  - **E (Explanation)**: 주장을 보충하는 부연 논증 설명
+                  - **E (Example)**: 객관적인 역사/사회적 사례 예시
+                  - **L (Link)**: 사례와 주장을 엮어 나의 입장 매핑
+                </div>
+                <div className="space-y-2">
+                  <span className="font-bold text-slate-800 block">✔ 반론 재반박(Concession)은 필수</span>
+                  글 전체의 객관성을 위해 반대 측의 주장도 그럴듯하다는 것을 수용한 뒤 재반박하는 것이 만점의 필수 조항입니다.
+                </div>
               </div>
             </div>
           </div>
@@ -691,13 +586,13 @@ export default function StepByStepTraining() {
             {/* Split Screen Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[500px] items-stretch">
               
-              {/* Left Panel: Outline OR Coach OR Background Study tabs (35%) */}
+              {/* Left Panel: Outline OR Coach tabs (35%) */}
               <div className="lg:col-span-1 bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden shadow-sm">
                 {/* Tabs */}
                 <div className="flex bg-slate-50 border-b border-slate-200 select-none">
                   <button
                     onClick={() => setLeftTab("outline")}
-                    className={`flex-1 py-3 text-[10px] font-bold text-center border-b-2 transition cursor-pointer ${
+                    className={`flex-1 py-3 text-xs font-bold text-center border-b-2 transition cursor-pointer ${
                       leftTab === "outline" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-slate-500 hover:text-slate-900"
                     }`}
                   >
@@ -705,25 +600,17 @@ export default function StepByStepTraining() {
                   </button>
                   <button
                     onClick={() => setLeftTab("coach")}
-                    className={`flex-1 py-3 text-[10px] font-bold text-center border-b-2 transition cursor-pointer ${
+                    className={`flex-1 py-3 text-xs font-bold text-center border-b-2 transition cursor-pointer ${
                       leftTab === "coach" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-slate-500 hover:text-slate-900"
                     }`}
                   >
                     코치 팁
                   </button>
-                  <button
-                    onClick={() => setLeftTab("background")}
-                    className={`flex-1 py-3 text-[10px] font-bold text-center border-b-2 transition cursor-pointer ${
-                      leftTab === "background" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-slate-500 hover:text-slate-900"
-                    }`}
-                  >
-                    배경 지식 (🇺🇸)
-                  </button>
                 </div>
 
                 {/* Tab content */}
                 <div className="flex-1 p-5 overflow-y-auto space-y-4">
-                  {leftTab === "outline" && (
+                  {leftTab === "outline" ? (
                     <div className="space-y-4 text-xs font-medium">
                       <div>
                         <span className="font-bold text-slate-400 uppercase tracking-wide block">My Stance (나의 입장)</span>
@@ -756,8 +643,7 @@ export default function StepByStepTraining() {
                         </p>
                       </div>
                     </div>
-                  )}
-                  {leftTab === "coach" && (
+                  ) : (
                     <div className="space-y-4 text-xs leading-relaxed text-slate-600">
                       <div>
                         <span className="font-bold text-slate-800 block mb-1">📝 표준 4문장 구조 템플릿</span>
@@ -792,7 +678,6 @@ export default function StepByStepTraining() {
                       </div>
                     </div>
                   )}
-                  {leftTab === "background" && renderBackgroundStudy()}
                 </div>
               </div>
 
@@ -941,13 +826,13 @@ export default function StepByStepTraining() {
             </div>
 
             {/* Beginner Coach Panel (Right 1/3) */}
-            <div className="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 h-[600px] overflow-y-auto">
+            <div className="lg:col-span-1 bg-white border border-slate-200 p-6 shadow-sm space-y-4 h-[550px] overflow-y-auto rounded-2xl">
               <h3 className="font-extrabold text-slate-900 text-sm flex items-center space-x-2 border-b border-slate-100 pb-2">
                 <CheckSquare className="h-4.5 w-4.5 text-indigo-600" />
                 <span>AWA 초보 코치: 교정 가이드</span>
               </h3>
               
-              <div className="space-y-3 text-xs leading-relaxed text-slate-600 font-medium">
+              <div className="space-y-3 text-xs leading-relaxed text-slate-655 font-medium">
                 <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100 text-slate-750">
                   <span className="font-bold text-indigo-700 block mb-1">💡 사소한 실수를 잡아내는 팁</span>
                   글을 소리 내어 (마음속으로) 읽으며 주어와 동사의 단복수 일치, 혹은 시제 일치가 틀린 부분이 있는지 확인해 보세요.
