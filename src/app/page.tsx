@@ -17,9 +17,7 @@ import {
   ChevronRight,
   Filter,
   Info,
-  Database,
-  Check,
-  X
+  Database
 } from "lucide-react";
 import { greTopics, GRETopic } from "../data/gre-topics";
 
@@ -48,13 +46,19 @@ export default function Dashboard() {
     if (storedHistory) {
       try {
         const parsed = JSON.parse(storedHistory);
-        // Filter out the old mock history items (hist-1, hist-2)
-        const filtered = parsed.filter((item: any) => item.id !== "hist-1" && item.id !== "hist-2");
-        setHistory(filtered);
-        // Update localStorage to commit the cleanup
-        localStorage.setItem("gre_awa_history", JSON.stringify(filtered));
+        if (Array.isArray(parsed)) {
+          // Wipes only the old mock data (hist-1, hist-2) but keeps everything else
+          const filtered = parsed.filter((item: any) => item && item.id !== "hist-1" && item.id !== "hist-2");
+          setHistory(filtered);
+          // Persist the clean array to localStorage so it stays on refresh
+          localStorage.setItem("gre_awa_history", JSON.stringify(filtered));
+        } else {
+          setHistory([]);
+          localStorage.setItem("gre_awa_history", JSON.stringify([]));
+        }
       } catch (e) {
         setHistory([]);
+        localStorage.setItem("gre_awa_history", JSON.stringify([]));
       }
     } else {
       setHistory([]);
@@ -76,7 +80,7 @@ export default function Dashboard() {
     setSelectedTopic(greTopics[randomIndex]);
   };
 
-  const startPractice = (mode: "step-by-step" | "mock-test") => {
+  const startPractice = (mode: "guided-beginner" | "guided-intermediate" | "mock-test") => {
     localStorage.setItem("gre_current_topic", JSON.stringify(selectedTopic));
     router.push(`/${mode}`);
   };
@@ -121,7 +125,7 @@ export default function Dashboard() {
             </h1>
             <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-3xl font-medium">
               GRE 라이팅의 유일한 과제인 **&quot;Analyze an Issue&quot;**를 위한 초보자 맞춤형 에세이 코치입니다. 
-              지시문 탐색기에서 원하는 기출 토픽을 검색한 뒤, 단계별 지도를 따르거나 실전 시험과 동일하게 타이핑 연습을 수행하세요.
+              지시문 탐색기에서 원하는 기출 토픽을 검색한 뒤, 자신의 숙련도에 맞춰 단계를 밟아가며 실력을 완성해보세요.
             </p>
           </div>
         </section>
@@ -325,78 +329,107 @@ export default function Dashboard() {
           {activeTab === "practice" ? (
             /* Practice Tab Workspace */
             <div className="space-y-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in">
-                {/* Card A: Step-by-Step */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch animate-fade-in">
+                {/* Level 1: Beginner */}
                 <motion.div 
                   whileHover={{ y: -4 }}
-                  className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm flex flex-col justify-between group hover:border-indigo-300 transition-all duration-300 relative overflow-hidden"
+                  className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between group hover:border-green-300 transition-all duration-300 relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 bg-indigo-50 text-indigo-700 text-xs font-extrabold px-4 py-2 rounded-bl-2xl border-l border-b border-indigo-100">
-                    초보자 추천 (Recommended)
+                  <div className="absolute top-0 right-0 bg-green-50 text-green-700 text-[10px] font-black px-3.5 py-1.5 rounded-bl-xl border-l border-b border-green-100">
+                    쌩초보 추천
                   </div>
                   
-                  <div className="space-y-5">
-                    <div className="h-14 w-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-inner">
-                      <BookOpen className="h-7 w-7" />
+                  <div className="space-y-4">
+                    <div className="h-12 w-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300 shadow-inner">
+                      <BookOpen className="h-6 w-6" />
                     </div>
-                    <div className="space-y-3">
-                      <h2 className="text-2xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
-                        단계별 연습 모드
-                        <span className="block text-sm font-semibold text-slate-400 mt-1">Step-by-Step Guided Training</span>
+                    <div className="space-y-2">
+                      <h2 className="text-lg font-black text-slate-900 group-hover:text-green-600 transition-colors">
+                        1단계: 완전 쌩초보 모드
+                        <span className="block text-xs font-semibold text-slate-400 mt-0.5">Guided Beginner</span>
                       </h2>
-                      <p className="text-slate-650 text-sm leading-relaxed font-medium">
-                        에세이를 처음 쓰는 입문자 전용 모드입니다. **분석 → 아웃라인 설계 → 좌우분할 화면 작성 → 자가 교정**의 4단계 템플릿과 실시간 코치 도움말(단락 구조, 단어 은행)을 지원하여 논리 정연한 글을 손쉽게 써 내려가도록 이끕니다.
+                      <p className="text-slate-600 text-xs leading-relaxed font-medium">
+                        AWA가 생전 처음인 왕초보를 위한 집중 훈련입니다. 문맥 쟁점 해부와 서론 입장문(Thesis) 생성 템플릿 빌더를 통해 **서론과 본론 1문단(150~250단어)** 완결을 연습하며, AI 역시 1개 문단 완성도 위주로 장려 점수를 줍니다.
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-500">
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-md">분석 3분</span>
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-md">개요 5분</span>
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-md">드래프트 20분</span>
-                    </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400">목표: 150~250단어</span>
                     <button 
-                      onClick={() => startPractice("step-by-step")}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg flex items-center space-x-2 transition duration-200 cursor-pointer"
+                      onClick={() => startPractice("guided-beginner")}
+                      className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xs shadow-sm flex items-center space-x-1.5 transition duration-200 cursor-pointer"
                     >
-                      <span>연습 시작</span>
-                      <ArrowRight className="h-4 w-4" />
+                      <span>1단계 시작</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </motion.div>
 
-                {/* Card B: Mock Test */}
+                {/* Level 2: Intermediate */}
                 <motion.div 
                   whileHover={{ y: -4 }}
-                  className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm flex flex-col justify-between group hover:border-slate-350 transition-all duration-300"
+                  className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between group hover:border-indigo-300 transition-all duration-300 relative overflow-hidden"
                 >
-                  <div className="space-y-5">
-                    <div className="h-14 w-14 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-700 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-300 shadow-inner">
-                      <Clock className="h-7 w-7" />
+                  <div className="absolute top-0 right-0 bg-indigo-50 text-indigo-700 text-[10px] font-black px-3.5 py-1.5 rounded-bl-xl border-l border-b border-indigo-100">
+                    중급자 추천
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="h-12 w-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-inner">
+                      <PenTool className="h-6 w-6" />
                     </div>
-                    <div className="space-y-3">
-                      <h2 className="text-2xl font-black text-slate-900 group-hover:text-slate-700 transition-colors">
-                        실전 모의고사 모드
-                        <span className="block text-sm font-semibold text-slate-400 mt-1">Realistic Mock Exam</span>
+                    <div className="space-y-2">
+                      <h2 className="text-lg font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
+                        2단계: 조금 해본 사람 모드
+                        <span className="block text-xs font-semibold text-slate-400 mt-0.5">Template Intermediate</span>
                       </h2>
-                      <p className="text-slate-650 text-sm leading-relaxed font-medium">
-                        실제 GRE 시험장 소프트웨어와 동질의 긴장감을 재현합니다. 화면 일시정지가 불가능한 **30분 타이머**가 작동하며, 편집 도구나 장식 없는 순수 텍스트 편집기 안에서 시간 조절 및 타자 입력 연습을 훈련합니다.
+                      <p className="text-slate-600 text-xs leading-relaxed font-medium">
+                        뼈대는 잡히지만 살을 붙이기 버거운 중급자 전용입니다. Stance별 개요 설계기를 기반으로 **서론-본론2개-반론재반박-결론의 5문단 풀 에세이(350~500단어)**를 고급 학술 전환사 템플릿 도움을 받아 타이핑하고, 공식 루브릭으로 점수를 냅니다.
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex space-x-2 text-[10px] font-bold text-slate-500">
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-md">제한 시간 30:00</span>
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-md">실전 인터페이스</span>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400">목표: 350~500단어</span>
+                    <button 
+                      onClick={() => startPractice("guided-intermediate")}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-xs shadow-sm flex items-center space-x-1.5 transition duration-200 cursor-pointer"
+                    >
+                      <span>2단계 시작</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* Level 3: Mock Test */}
+                <motion.div 
+                  whileHover={{ y: -4 }}
+                  className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between group hover:border-slate-350 transition-all duration-300"
+                >
+                  <div className="space-y-4">
+                    <div className="h-12 w-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-700 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-300 shadow-inner">
+                      <Clock className="h-6 w-6" />
                     </div>
+                    <div className="space-y-2">
+                      <h2 className="text-lg font-black text-slate-900 group-hover:text-slate-700 transition-colors">
+                        3단계: 실전 30분 모의고사
+                        <span className="block text-xs font-semibold text-slate-400 mt-0.5">Realistic Mock Exam</span>
+                      </h2>
+                      <p className="text-slate-600 text-xs leading-relaxed font-medium">
+                        실제 GRE 시험장 소프트웨어와 100% 동일한 고밀도 타자 훈련입니다. 일시정지가 안 되는 **30분 타이머** 하에, 도움말이나 뼈대 없는 백지 에디터에서 시간 안배와 오타 통제 능력을 실제 고사장 압박감 수준에서 훈련합니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400">제한시간: 30분</span>
                     <button 
                       onClick={() => startPractice("mock-test")}
-                      className="bg-indigo-900 hover:bg-indigo-950 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg flex items-center space-x-2 transition duration-200 cursor-pointer"
+                      className="bg-indigo-900 hover:bg-indigo-950 text-white font-bold py-2 px-4 rounded-lg text-xs shadow-sm flex items-center space-x-1.5 transition duration-200 cursor-pointer"
                     >
-                      <span>모의고사 시작</span>
-                      <ArrowRight className="h-4 w-4" />
+                      <span>3단계 모의고사 시작</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </motion.div>
@@ -457,12 +490,12 @@ export default function Dashboard() {
                       <h3 className="text-lg font-bold text-slate-900">첫 번째 GRE 에세이를 작성해보세요!</h3>
                       <p className="text-sm text-slate-500 leading-relaxed font-medium">
                         아직 기록된 에세이 연습 이력이 없습니다. 맨 위 공식 이슈 풀에서 원하시는 주제를 골라 선택하신 후, 위의 모드 버튼을 눌러 연습하세요. 
-                        평가 결과가 이곳에 실시간으로 실시간 저장됩니다.
+                        평가 결과가 이곳에 실시간으로 저장되며, 새로고침해도 영구 보존됩니다.
                       </p>
                     </div>
                     <div className="pt-2">
                       <button
-                        onClick={() => startPractice("step-by-step")}
+                        onClick={() => startPractice("guided-beginner")}
                         className="bg-indigo-600 hover:bg-indigo-750 text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow hover:shadow-md transition inline-flex items-center space-x-2 cursor-pointer"
                       >
                         <span>첫 에세이 작성하러 가기</span>
@@ -502,7 +535,7 @@ export default function Dashboard() {
                         </div>
                         <div className="bg-white border border-slate-100 rounded-xl p-3.5 space-y-2">
                           <span className="text-[10px] font-bold text-indigo-600 block tracking-wider">🇺🇸 US Background Example (미국 배경지식 사례)</span>
-                          <p className="text-slate-650 text-xs leading-relaxed font-medium">{pt.exampleKo}</p>
+                          <p className="text-slate-655 text-xs leading-relaxed font-medium">{pt.exampleKo}</p>
                           <p className="font-mono text-slate-400 italic text-[11px] leading-relaxed border-t border-slate-100 pt-1.5">{pt.exampleEn}</p>
                         </div>
                       </div>
@@ -520,12 +553,12 @@ export default function Dashboard() {
                       <div key={idx} className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3.5 shadow-sm hover:border-red-200 transition">
                         <div className="space-y-1">
                           <span className="text-[10px] font-bold text-slate-400 uppercase block tracking-wider">Argument {idx + 1} (논증)</span>
-                          <p className="text-slate-850 text-sm font-extrabold leading-relaxed">{pt.argumentKo}</p>
+                          <p className="text-slate-855 text-sm font-extrabold leading-relaxed">{pt.argumentKo}</p>
                           <p className="font-mono text-slate-500 italic text-xs leading-relaxed border-t border-slate-200/50 pt-2">{pt.argumentEn}</p>
                         </div>
                         <div className="bg-white border border-slate-100 rounded-xl p-3.5 space-y-2">
                           <span className="text-[10px] font-bold text-red-500 block tracking-wider">🇺🇸 US Background Example (미국 배경지식 사례)</span>
-                          <p className="text-slate-650 text-xs leading-relaxed font-medium">{pt.exampleKo}</p>
+                          <p className="text-slate-655 text-xs leading-relaxed font-medium">{pt.exampleKo}</p>
                           <p className="font-mono text-slate-400 italic text-[11px] leading-relaxed border-t border-slate-100 pt-1.5">{pt.exampleEn}</p>
                         </div>
                       </div>

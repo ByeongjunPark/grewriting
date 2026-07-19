@@ -9,7 +9,10 @@ const client = new OpenAI({
   baseURL: UPSTAGE_BASE_URL,
 });
 
-const systemPrompt = `You are an expert GRE Analytical Writing (AWA) Examiner. Your task is to grade the student's essay based on the official ETS "Analyze an Issue" scoring guide.
+function getSystemPrompt(level?: string) {
+  const isBeginner = level === "beginner";
+
+  return `You are an expert GRE Analytical Writing (AWA) Examiner. Your task is to grade the student's essay based on the official ETS "Analyze an Issue" scoring guide.
 
 Official ETS "Analyze an Issue" Scoring Rubrics:
 - Score 6 (Outstanding): Presents a cogent, well-articulated analysis of the issue. Articulates a clear and insightful position in accordance with the assigned task. Develops the position fully with compelling reasons and/or persuasive examples. Sustains a well-focused, well-organized analysis, connecting ideas logically. Conveys ideas fluently and precisely, using effective vocabulary and sentence variety. Superior grammar/mechanics.
@@ -19,6 +22,16 @@ Official ETS "Analyze an Issue" Scoring Rubrics:
 - Score 2 (Seriously Flawed): Largely disregards specific task directions. Serious weaknesses in analytical writing. Few, if any, relevant reasons/examples. Poorly focused/organized. Serious language problems frequently interfering with meaning.
 - Score 1 (Fundamentally Deficient): Fundamental deficiencies. Little or no evidence of understanding the issue or ability to develop an organized response. Severe language problems persistently interfering with meaning.
 - Score 0: Off-topic, blank, foreign language, copied topic, etc.
+
+${isBeginner ? `[CRITICAL NOTE FOR BEGINNER LEVEL (1단계)]
+The user is an absolute beginner. They were instructed to write a short-form draft containing ONLY the Introduction and ONE Body paragraph (around 150-250 words goal).
+Do NOT penalize them for not writing a full 5-paragraph essay, and do NOT penalize them for missing a second body paragraph or conclusion.
+Instead, evaluate them on a relative scale based on:
+1. Thesis Statement Clarity: Did they articulate a clear stance in the introduction?
+2. Body Paragraph Structure: Did they structure the body paragraph using the PEEL format (Point, Explanation, Example, Link) and support it with a valid US example?
+3. Grammar and Mechanics.
+Give them a realistic yet encouraging score (e.g., up to 6.0 based on these simplified beginner criteria). Provide constructive feedback in Korean, explaining how they can expand this draft into a full essay (e.g., adding a second body paragraph, a concession, and a conclusion).` : `[CRITICAL NOTE FOR FULL ESSAY LEVEL (2, 3단계)]
+The user is writing a full-length essay. Grade their draft strictly according to the official ETS standards. Look for a complete introduction, multiple body paragraphs, a concession/rebuttal section, and a conclusion.`}
 
 You must evaluate:
 1. Issue Response (주제 대응)
@@ -59,11 +72,12 @@ For output, you MUST return a single, valid JSON object with EXACTLY the followi
   "modelEssay": "A high-scoring, 6.0-level model essay for this specific prompt, written in English. Ensure it is around 400-550 words and demonstrates superior sentence variety and compelling reasoning."
 }
 `;
+}
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { prompt, instruction, essay, mode, outline, stance, summary } = body;
+    const { prompt, instruction, essay, mode, outline, stance, summary, level } = body;
 
     if (!essay || essay.trim().length === 0) {
       return NextResponse.json(
@@ -75,6 +89,7 @@ export async function POST(request: Request) {
     const userPrompt = `
 [CONTEXT]
 Practice Mode: ${mode}
+Level: ${level || "full"}
 ${stance ? `Selected Stance: ${stance}` : ""}
 ${summary ? `User's Core Tension Summary: ${summary}` : ""}
 ${outline ? `User's Outline Plan:
@@ -98,7 +113,7 @@ Please evaluate this draft. Check if the user followed the specific task instruc
     const response = await client.chat.completions.create({
       model: "solar-pro3",
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: getSystemPrompt(level) },
         { role: "user", content: userPrompt }
       ],
       // @ts-ignore
